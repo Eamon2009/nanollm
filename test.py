@@ -1,80 +1,30 @@
-from torch.nn import functional as F
-import torch.nn as nn
 import torch
+batch_size = 20   # These many independent sequences will we process in parallel
+block_size = 128  # This is the maximum context length for predictions
+# ------------
 
 
-torch.seed(1337)
-vocab_size = 21
-chars2 = ['e', 'a', 'm', 'o', 'n', 'b', 'c', 'd']
-stri = {}
-for i in range(len(chars2)):
-    ch = chars2[i]
-    stri[ch] = i
+with open('input.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
 
-it = {}
-for i in range(len(chars2)):
-    ch = chars2[i]
-    it[i] = ch
+chars = sorted(list(set(text)))
+vocab_size = len(chars)
+sttoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for i, ch in enumerate(chars)}
 
 
-def encode(s):
-    encoded_list = []
-    for c in s:
-        encoded_list.append(stri[c])
-    return encoded_list
-
-
-def decode(l):
-    decoded_chars = []
+def encode(l):
+    encoded = []
     for i in l:
-        decoded_chars.append(it[i])
-    return "".join(decoded_chars)
+        encoded.append(sttoi[i])
+    return encoded
 
 
-torch.manual_seed(1337)
-batch_size = 4
-block_size = 8
+def decode(l): return ''.join([itos[i] for i in l])
 
 
-def get_batch(split):
-    # generate a small batch of data of inputs x and targets y
-    data = train_data if split == 'train' else val_data
-    ix = torch.randint(len(data) - block_size, (batch_size,))
-    x = torch.stack([data[i:i+block_size] for i in ix])
-    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
-    return x, y
-
-
-xb, yb = get_batch('train')
-# -------------------------------------------
-
-
-class LanguageModel(nn.Module):
-    def __init__(self, vocab_size):
-        super().__init__()
-        self.token_embedding = nn.Embedding(vocab_size)
-
-    def forward(self, idx, targets=None):
-        logits = self.token_embedding(idx)
-
-        if targets is None:
-            loss = None
-        else:
-            B, T, C = logits.shape
-            logits = torch.view(B*T, C)
-            targets = torch.view(B*T)
-            loss = F.cross_entropy(logits, targets)
-
-            return loss, logits
-
-    def generate(self, idx, max_new_tokens):
-        for _ in range(max_new_tokens):
-            logits, loss = self(idx)
-            logits = logits[:, -1, :]
-            probs = F.softmax(logits, dim=-1)
-            idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
-        return idx
-
-
-m = LanguageModel(vocab_size)
+# Converting into tensor
+data = torch.tensor(encode(text), dtype=torch.long)
+n = (0.9*len(data))    # Data split
+train_data = data[:n]  # 90% training Data
+val_data = data[n:]    # 10% validation Data
