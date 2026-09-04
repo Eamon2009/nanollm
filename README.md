@@ -1,10 +1,9 @@
 <h1 align="center"> nanollm</h1>
 <img width="1604" height="328" alt="image" src="https://github.com/user-attachments/assets/aa40fd1b-e288-4f82-9a0d-d0c45b724aba" />
-# llm.cpp
 
-llm.cpp is the simplest setup for training small language models and image classifiers from scratch. It runs on a single GPU, a multi-GPU node, or even CPU. The code is minimal and hackable -- no frameworks, no config hell, just PyTorch and your data.
+nanollm is the simplest setup for training small language models and image classifiers from scratch. It runs on a single GPU, a multi-GPU node, or even CPU. The code is minimal and hackable -- no frameworks, no config hell, just PyTorch and your data.
 
-You can train a GPT-2 style tokenizer-based LLM on your own text shards and talk to it over CLI. Or flip a switch and train an image classifier on a folder of images. Both share the same training bones: cosine LR, warmup, gradient clipping, mixed precision, and checkpointing.
+You can train a GPT style tokenizer-based LLM on your own text shards and talk to it over CLI. Or flip a switch and train an image classifier on a folder of images. Both share the same training bones: cosine LR, warmup, gradient clipping, mixed precision, and checkpointing.
 
 The whole thing fits in a few files. Read them, change them, break them.
 
@@ -199,4 +198,4 @@ Both use the same training loop bones: AdamW, AMP, checkpointing on best metric,
 
 ## License
 
-GPL-3.0 (see `main.py` header)
+MIT
